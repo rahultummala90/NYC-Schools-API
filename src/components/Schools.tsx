@@ -9,10 +9,15 @@ type SchoolProps = {
 
 export const Schools = () => {
   const [schools, setSchools] = useState<SchoolProps | null>(null);
+  const [error, setError] = useState("");
 
-  const data = fetchData(process.env.REACT_APP_NYC_URL)
-    .then((response) => setSchools(response.data))
-    .catch((error) => {});
+  const data = fetchData(process.env.REACT_APP_NYC_URL).then((response) => {
+    if (response.status === 200) {
+      setSchools(response.data);
+    } else {
+      setError("Unable to fetch the data");
+    }
+  });
 
   useMemo(() => data, [data]);
 
@@ -23,17 +28,19 @@ export const Schools = () => {
         <div className="px-6 py-4">
           <div className="font-bold text-xl mb-2">NYC High Schools</div>
           <div className="pt-4">
-            {schools?.map((school: any) => (
-              <div
-                key={school.dbn}
-                className="border-radius-2 block rounded-lg bg-gray-200 mb-2 p-6 dark:bg-neutral-700"
-              >
-                <Link to={"school/" + school.dbn}>
-                  <p>School Name: {school.school_name}</p>
-                  <p>DBN: {school.dbn}</p>
-                </Link>
-              </div>
-            ))}
+            {schools &&
+              schools?.map((school: any) => (
+                <div
+                  key={school.dbn}
+                  className="border-radius-2 block rounded-lg bg-gray-200 mb-2 p-6 dark:bg-neutral-700"
+                >
+                  <Link to={"school/" + school.dbn}>
+                    <p>School Name: {school.school_name}</p>
+                    <p>DBN: {school.dbn}</p>
+                  </Link>
+                </div>
+              ))}
+            {error && <div>{error}</div>}
           </div>
         </div>
       </div>

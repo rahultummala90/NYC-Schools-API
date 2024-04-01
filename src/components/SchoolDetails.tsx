@@ -9,12 +9,19 @@ type SchoolDetailProps = {
 export const SchoolDetails = () => {
   let { dbn } = useParams();
   const [details, setDetails] = useState<SchoolDetailProps | null>(null);
+  const [error, setError] = useState("");
 
-  const data = fetchData(process.env.REACT_APP_NYC_URL + `?dbn=${dbn}`)
-    .then((response) => setDetails(response.data))
-    .catch((error) => {});
+  const data = fetchData(process.env.REACT_APP_NYC_URL + `?dbn=${dbn}`).then(
+    (response) => {
+      if (response.status === 200) {
+        setDetails(response.data);
+      } else {
+        setError("Unable to fetch the data");
+      }
+    }
+  );
 
-  useMemo(() => data, [data]);
+  useMemo(() => data, []);
 
   return (
     <div>
@@ -30,6 +37,7 @@ export const SchoolDetails = () => {
                   <p>{detail.overview_paragraph}</p>
                 </div>
               ))}
+            {error && <div>{error}</div>}
           </div>
         </div>
       </div>
